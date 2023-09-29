@@ -6,6 +6,7 @@ import pandas as pd
 from datetime import datetime
 
 from pinger_chart import plot
+from config import fn, save_every, sleep, urls
 
 from typing import NoReturn
 
@@ -28,15 +29,9 @@ def save_data(data: dict) -> NoReturn:
     df.to_csv(fn)
 
 
-def start() -> NoReturn:
+def start(fn: str, save_every: int, sleep: int, urls: dict) -> NoReturn:
     counter = 0
-    data = {
-        'date': [],
-        'google': [],
-        'wiki': [],
-        'youtube': []
-    }
-
+    data = {key: [] for key in list(urls.keys()) + ['date']}
     if not os.path.isfile(fn):
         pd.DataFrame(columns=list(data.keys())).to_csv(fn)
 
@@ -50,25 +45,13 @@ def start() -> NoReturn:
                 latency = get_latency(url)
                 print('    ', key, latency)
                 data[key].append(latency)
-
-            if counter % SAVE_EVERY == 0:
+            if counter % save_every == 0:
                 save_data(data)
                 plot(fn)
-                counter = 0
-                data = {'date': [], 'google': [], 'wiki': [], 'youtube': []}
-            time.sleep(SLEEP)
+                data = {key: [] for key in list(urls.keys()) + ['date']}
+            time.sleep(sleep)
         except Exception as e:
             print(e)
 
 
-fn = 'latency.csv'
-SAVE_EVERY = 50
-SLEEP = 10
-
-urls = {
-    'google': 'google.com',
-    'wiki': 'wikipedia.org',
-    'youtube': 'youtube.com',
-}
-
-start()
+start(fn, save_every, sleep, urls)
