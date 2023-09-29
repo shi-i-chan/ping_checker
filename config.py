@@ -1,5 +1,5 @@
 fn = 'latency.csv'
-save_every = 1  # n interations
+save_every = 10  # n interations
 sleep = 10  # n seconds
 
 urls = {
